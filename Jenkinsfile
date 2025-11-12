@@ -4,7 +4,7 @@ pipeline {
 
     environment {
 
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
 
         DOCKER_IMAGE = "sugaanks/java-app"
 
