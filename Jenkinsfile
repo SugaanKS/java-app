@@ -1,78 +1,87 @@
 pipeline {
 
     agent any
+ 
+    tools {
 
+        maven 'Maven'
+
+    }
+ 
     environment {
+
+        // This line is where the error happens.
 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
 
-        DOCKER_IMAGE = "sugaanks/java-app"
+        DOCKER_IMAGE_NAME = "sugaanks/java-app" // Ensure this is your correct Docker Hub username
+
+        DOCKER_IMAGE_TAG  = "latest"
 
     }
-
+ 
     stages {
-
-        stage('Checkout Code') {
-
-            steps {
-
-                git url: 'https://github.com/SugaanKS/java-app.git', branch: 'main'
-
-            }
-
-        }
 
         stage('Build with Maven') {
 
             steps {
 
-                sh 'mvn clean install'
+                sh 'mvn clean package'
 
             }
 
         }
-
+ 
         stage('Build Docker Image') {
 
             steps {
 
-                sh 'docker build -t $DOCKER_IMAGE .'
+                script {
+
+                    docker.build(DOCKER_IMAGE_NAME, ".")
+
+                }
 
             }
 
         }
+ 
+        // <<< THIS IS THE CRITICAL NEW STAGE >>>
 
-        stage('Login to Docker Hub') {
+        stage('Debug Credentials') {
 
             steps {
 
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                // This will ONLY work if the credential is a 'Username with password' type.
+
+                // The pipeline automatically provides _USR and _PSW variables.
+
+                sh 'echo "DEBUG: Successfully found the credential. Username is: ${DOCKERHUB_CREDENTIALS_USR}"'
 
             }
 
         }
-
+ 
         stage('Push Docker Image') {
 
             steps {
 
-                sh 'docker push $DOCKER_IMAGE'
+                script {
+
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds') {
+
+                        docker.image(DOCKER_IMAGE_NAME).push(DOCKER_IMAGE_TAG)
+
+                    }
+
+                }
 
             }
-
-        }
-
-    }
-
-    post {
-
-        always {
-
-            echo 'Pipeline finished!'
 
         }
 
     }
 
 }
+
  
