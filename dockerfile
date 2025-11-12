@@ -1,5 +1,11 @@
-FROM openjdk:17
-
-COPY target/java-app-1.0-SNAPSHOT.jar /app.jar
-
-ENTRYPOINT ["java" , "-jar", "/app.jar"]
+FROM eclipse-temurin:17-jdk-jammy
+ 
+VOLUME /tmp
+ 
+EXPOSE 8080
+ 
+ARG JAR_FILE=target/*.jar
+ 
+ADD ${JAR_FILE} app.jar
+ 
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
