@@ -1,27 +1,39 @@
 ---
 - name: Deploy Java Application Docker Container
-  hosts: appserver
-  become: yes
+  hosts: appserver # This matches the group in your inventory file
+  become: yes      # This tells Ansible to run commands with sudo
  
   tasks:
-    # ... (the pip install tasks are still good to have) ...
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
  
-    - name: Pull a simple web server image from Docker Hub
+    - name: Install pip for Python 3
+      apt:
+        name: python3-pip
+        state: present
+ 
+    - name: Install Docker SDK for Python
+      pip:
+        name: docker
+        state: present
+ 
+    - name: Pull the latest Docker image from Docker Hub
       docker_image:
-        name: "nginxdemos/hello" # Use a known working web server image
+        name: "sugaanks/java-app:latest" # Use your actual Docker image name
         source: pull
         state: present
  
     - name: Stop and remove any existing container of the same name
       docker_container:
-        name: "java-app" # We can keep the name
+        name: "java-app"
         state: absent
  
-    - name: Run the test web server container
+    - name: Run the Docker container
       docker_container:
         name: "java-app"
-        image: "nginxdemos/hello" # Use the test image
+        image: "sugaanks/java-app:latest" # Use your actual Docker image name
         state: started
         restart_policy: always
         ports:
-          - "8080:80" # Map host 8080 to CONTAINER port 80 (where nginx listens)
+          - "8080:8080" # Map port 8080 on the host to port 8080 in the container
