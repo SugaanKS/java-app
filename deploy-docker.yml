@@ -1,0 +1,27 @@
+---
+- name: Deploy Java Application Docker Container
+  hosts: appserver
+  become: yes
+ 
+  tasks:
+    # ... (the pip install tasks are still good to have) ...
+ 
+    - name: Pull a simple web server image from Docker Hub
+      docker_image:
+        name: "nginxdemos/hello" # Use a known working web server image
+        source: pull
+        state: present
+ 
+    - name: Stop and remove any existing container of the same name
+      docker_container:
+        name: "java-app" # We can keep the name
+        state: absent
+ 
+    - name: Run the test web server container
+      docker_container:
+        name: "java-app"
+        image: "nginxdemos/hello" # Use the test image
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:80" # Map host 8080 to CONTAINER port 80 (where nginx listens)
