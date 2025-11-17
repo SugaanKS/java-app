@@ -4,7 +4,7 @@
 
   hosts: appserver # This matches the group in your inventory file
 
-  become: yes      # This tells Ansible to run commands with sudo
+  become: yes      # This  tells how Ansible to run commands with sudo
  
   tasks:
 
