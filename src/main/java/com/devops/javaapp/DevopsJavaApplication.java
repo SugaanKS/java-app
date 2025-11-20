@@ -34,7 +34,7 @@ public class DevopsJavaApplication {
 
         // You can customize this message
 
-        return "<h1>Hello, DevOps World!</h1><p>Your Java application was successfully deployed via Jenkins and Ansible.</p>";
+        return "<h1>Hello, DevOps World!</h1><p>Yours Java application was successfully deployed via Jenkins and Ansible.</p>";
 
     }
 
